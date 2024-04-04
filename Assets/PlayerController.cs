@@ -3,22 +3,35 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum ElColorRVA
+{
+    Rojo,
+    Verde,
+    Azul
+}
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] ElColorRVA ElColor;
     Rigidbody2D MyRigidbody2D;
+    SpriteRenderer MySpriteRenderer;
     float direccion;
-    [SerializeField] float ElColor;
+    [SerializeField] Vector2 tamaño;
+    [SerializeField] Vector2 PosicionBox;
+    [SerializeField] bool TocaAlgo;
     [SerializeField] float FuerzaDeSalto;
     [SerializeField] float velocidad;
     [SerializeField] float DistanceRaycast;
     [SerializeField] int numeroDeSaltos;
     [SerializeField] LayerMask Layers;
+    [SerializeField] LayerMask LayersEnemigos;
 
     Collider2D Colicion;
     // Start is called before the first frame update
     void Start()
     {
         MyRigidbody2D = GetComponent<Rigidbody2D>();
+        MySpriteRenderer = GetComponent<SpriteRenderer>();
+        MySpriteRenderer.color = ElColor == ElColorRVA.Rojo ? Color.red : ElColor == ElColorRVA.Azul ? Color.blue : Color.green;
     }
 
     // Update is called once per frame
@@ -30,17 +43,8 @@ public class PlayerController : MonoBehaviour
         {
             numeroDeSaltos = 2;
         }
-        print(ElColor);
-        /*
-        if (ElColor != 0)
-        {
-            print("cambio");
-        }
-        else
-        {
-            print("sigue");
-        }
-        */
+        if (Physics2D.BoxCast(new Vector2(transform.position.x + PosicionBox.x, transform.position.y + PosicionBox.y), tamaño, LayersEnemigos)) ;
+        
     }
 
 
@@ -62,14 +66,27 @@ public class PlayerController : MonoBehaviour
         }
         
     }
-    public void cambiarDeColor(InputAction.CallbackContext Value)
+    void cambiarDeColor()
     {
-        if (Value.started)
-            ElColor = Value.ReadValue<float>();
+
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    public void cambiarDeColorRojo(InputAction.CallbackContext Value)
     {
-
+        ElColor = ElColorRVA.Rojo;
+        MySpriteRenderer.color = Color.red;
+        cambiarDeColor();
+    }
+    public void cambiarDeColorVerde(InputAction.CallbackContext Value)
+    {
+        ElColor = ElColorRVA.Verde;
+        MySpriteRenderer.color = Color.green;
+        cambiarDeColor();
+    }
+    public void cambiarDeColorAzul(InputAction.CallbackContext Value)
+    {
+        ElColor = ElColorRVA.Azul;
+        MySpriteRenderer.color = Color.blue;
+        cambiarDeColor();
     }
 }

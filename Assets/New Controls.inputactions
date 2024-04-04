@@ -24,13 +24,31 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "New action",
-                    "type": "Value",
+                    "name": "CambiarDeColorR",
+                    "type": "Button",
                     "id": "c63db548-02a9-4fd4-b47d-d023fbaa6e10",
-                    "expectedControlType": "Axis",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CambiarDeColorV",
+                    "type": "Button",
+                    "id": "f5cb7465-2a8f-4eaa-bcc0-7211354f3e51",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CambiarDeColorA",
+                    "type": "Button",
+                    "id": "d81a2257-281e-48d7-849d-04b7a34dfe76",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -79,48 +97,37 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "Button With Two Modifiers",
-                    "id": "d193c781-94b8-4710-8611-06e4a0ceba02",
-                    "path": "ButtonWithTwoModifiers",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "New action",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Modifier 1",
-                    "id": "7a879793-8502-4a91-bf11-1dded469b833",
-                    "path": "<Keyboard>/p",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "New action",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Modifier 2",
-                    "id": "fc6d5521-ddf4-45be-bea3-46125c593be7",
+                    "name": "",
+                    "id": "f1ccd48c-447e-4ebc-8cb4-723d41f44d01",
                     "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "CambiarDeColorR",
                     "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
                 },
                 {
-                    "name": "Button",
-                    "id": "7059afd4-6d75-44a7-8d50-178a817aa1ae",
+                    "name": "",
+                    "id": "67dc016b-34ac-4c8a-81f2-579e45fd952f",
                     "path": "<Keyboard>/o",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "CambiarDeColorV",
                     "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b2860b25-1b36-49d8-abbe-02e2f62986ee",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CambiarDeColorA",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }
