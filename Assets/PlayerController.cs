@@ -14,18 +14,31 @@ public class PlayerController : MonoBehaviour
     [SerializeField] ElColorRVA ElColor;
     Rigidbody2D MyRigidbody2D;
     SpriteRenderer MySpriteRenderer;
+
+
     float direccion;
-    [SerializeField] Vector2 tamaño;
-    [SerializeField] Vector2 PosicionBox;
-    [SerializeField] bool TocaAlgo;
     [SerializeField] float FuerzaDeSalto;
     [SerializeField] float velocidad;
+
+
     [SerializeField] float DistanceRaycast;
     [SerializeField] int numeroDeSaltos;
+    [SerializeField] int numeroDeSaltosMax;
     [SerializeField] LayerMask Layers;
-    [SerializeField] LayerMask LayersEnemigos;
 
-    Collider2D Colicion;
+
+    [SerializeField] float time=100;
+    [SerializeField] float timeMax;
+    [SerializeField] bool TocaAlgo;
+    [SerializeField] LayerMask LayersEnemigos;
+    public Vector2 size = new Vector2(1, 1);
+    public float distance = 5f;
+    public Color color;
+    bool IdaSubida;
+
+
+
+    public int Vida = 10;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,14 +50,57 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        time += Time.deltaTime;
+        #region movimiento
         transform.position += new Vector3(direccion * velocidad * Time.deltaTime, 0, 0);
+        #endregion
+
+        #region raycastSalto
         Debug.DrawRay(transform.position, Vector2.down * DistanceRaycast,Color.red);
-        if (Physics2D.Raycast(transform.position, Vector2.down, DistanceRaycast, Layers))
+        if (Physics2D.Raycast(transform.position, Vector2.down, DistanceRaycast, Layers) && MyRigidbody2D.velocity.y<0)
         {
-            numeroDeSaltos = 2;
+            numeroDeSaltos = numeroDeSaltosMax;
         }
-        if (Physics2D.BoxCast(new Vector2(transform.position.x + PosicionBox.x, transform.position.y + PosicionBox.y), tamaño, LayersEnemigos)) ;
-        
+        #endregion
+
+        #region boxCast 
+        //Physics2D.BoxCast(el centro del boxscat,   tamaño del boxcast,    rotacion, direccion, mover el punto donde se creo, layer );
+        RaycastHit2D hit = Physics2D.BoxCast(transform.position, size, 0f, Vector2.right, distance, LayersEnemigos);
+
+        // Dibujar la BoxCast
+        DebugDrawBoxCast(transform.position, size, 0f, Vector2.right, distance, color);
+
+        if(hit.collider != null)
+        {
+            if (hit.collider.GetComponent<Enemigo>().ElColor != ElColor && time > timeMax)
+            {
+                Vida--;
+                time = 0;
+
+            }
+            TocaAlgo = true;
+        }
+
+        if (time < timeMax)
+        {
+
+            // Calcula el valor oscilante usando una función seno
+            float alpha = Mathf.Sin(Time.time * 10) * 1 + 0.5f; // Ajusta el offset para que esté entre 0 y 1
+
+            // Aplica el valor al componente de color alpha del material del SpriteRenderer
+            Color color = MySpriteRenderer.color;
+            color.a = alpha;
+            MySpriteRenderer.color = color;
+        }
+        else
+        {
+            Color color = MySpriteRenderer.color;
+            color.a = 1;
+            MySpriteRenderer.color = color;
+            TocaAlgo = false;
+        }
+        TocaAlgo = hit.collider != null ? true : false;
+        #endregion
     }
 
 
@@ -73,20 +129,58 @@ public class PlayerController : MonoBehaviour
 
     public void cambiarDeColorRojo(InputAction.CallbackContext Value)
     {
-        ElColor = ElColorRVA.Rojo;
-        MySpriteRenderer.color = Color.red;
-        cambiarDeColor();
+        if (!TocaAlgo)
+        {
+            ElColor = ElColorRVA.Rojo;
+            MySpriteRenderer.color = Color.red;
+            cambiarDeColor();
+        }
     }
     public void cambiarDeColorVerde(InputAction.CallbackContext Value)
     {
-        ElColor = ElColorRVA.Verde;
-        MySpriteRenderer.color = Color.green;
-        cambiarDeColor();
+        if (!TocaAlgo)
+        {
+            ElColor = ElColorRVA.Verde;
+            MySpriteRenderer.color = Color.green;
+            cambiarDeColor();
+        }
     }
     public void cambiarDeColorAzul(InputAction.CallbackContext Value)
     {
-        ElColor = ElColorRVA.Azul;
-        MySpriteRenderer.color = Color.blue;
-        cambiarDeColor();
+        if (!TocaAlgo)
+        {
+            ElColor = ElColorRVA.Azul;
+            MySpriteRenderer.color = Color.blue;
+            cambiarDeColor();
+        }
     }
+
+
+
+
+    void DebugDrawBoxCast(Vector2 origin, Vector2 size, float angle, Vector2 direction, float distance, Color color)
+    {
+        Vector2 center = origin + (direction.normalized * distance * 0.5f); // Calcular el centro del BoxCast
+        float halfDistance = distance * 0.5f; // Calcular la mitad de la distancia
+
+        // Calcular las esquinas del rectángulo del BoxCast
+        Vector2 topLeft = center + (Vector2)(Quaternion.Euler(0, 0, angle) * new Vector2(-size.x * 0.5f, size.y * 0.5f));
+        Vector2 topRight = center + (Vector2)(Quaternion.Euler(0, 0, angle) * new Vector2(size.x * 0.5f, size.y * 0.5f));
+        Vector2 bottomLeft = center + (Vector2)(Quaternion.Euler(0, 0, angle) * new Vector2(-size.x * 0.5f, -size.y * 0.5f));
+        Vector2 bottomRight = center + (Vector2)(Quaternion.Euler(0, 0, angle) * new Vector2(size.x * 0.5f, -size.y * 0.5f));
+
+        // Dibujar las líneas del rectángulo
+        Debug.DrawLine(topLeft, topRight, color);
+        Debug.DrawLine(topRight, bottomRight, color);
+        Debug.DrawLine(bottomRight, bottomLeft, color);
+        Debug.DrawLine(bottomLeft, topLeft, color);
+
+        // Dibujar las diagonales del rectángulo
+        Debug.DrawLine(topLeft, bottomRight, color);
+        Debug.DrawLine(topRight, bottomLeft, color);
+    }
+
+
+
+
 }
