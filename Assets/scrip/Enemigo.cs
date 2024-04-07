@@ -17,7 +17,7 @@ public class Enemigo : MonoBehaviour
     {
         
     }
-    protected void cambiarColor()
+    public void cambiarColor()
     {
         MySpriteRenderer = GetComponent<SpriteRenderer>();
         MySpriteRenderer.color = ElColor == ElColorRVA.Rojo ? Color.red : ElColor == ElColorRVA.Azul ? Color.blue : Color.green;

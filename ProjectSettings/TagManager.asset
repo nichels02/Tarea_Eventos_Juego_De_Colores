@@ -5,11 +5,14 @@ TagManager:
   serializedVersion: 2
   tags:
   - piso
+  - Moneda
+  - Corazon
+  - Final
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - ignore
   - Water
   - UI
   - piso

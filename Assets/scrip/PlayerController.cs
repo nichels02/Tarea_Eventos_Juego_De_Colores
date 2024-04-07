@@ -31,20 +31,45 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float timeMax;
     [SerializeField] bool TocaAlgo;
     [SerializeField] LayerMask LayersEnemigos;
-    public Vector2 size = new Vector2(1, 1);
-    public float distance = 5f;
-    public Color color;
+    [SerializeField] Vector2 size = new Vector2(1, 1);
+    [SerializeField] float distance = 5f;
+    [SerializeField] Color color;
     bool IdaSubida;
 
 
 
-    public int Vida = 10;
+    [SerializeField] int Vida = 10;
+    [SerializeField] int VidaMax = 10;
+    [SerializeField] int puntaje = 0;
+
+
+    public float PublicVida()
+    {
+        return (float)Vida;
+    }
+    public float PublicVidaMax()
+    {
+        return (float)VidaMax;
+    }
+    public float PublicPuntaje()
+    {
+        return (float)puntaje;
+    }
+
+    private void Awake()
+    {
+        Gamemanager._instancia.AgregarFuncion(PublicVida, 6);
+        Gamemanager._instancia.AgregarFuncion(PublicVidaMax, 7);
+        Gamemanager._instancia.AgregarFuncion(PublicPuntaje, 8);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         MyRigidbody2D = GetComponent<Rigidbody2D>();
         MySpriteRenderer = GetComponent<SpriteRenderer>();
         MySpriteRenderer.color = ElColor == ElColorRVA.Rojo ? Color.red : ElColor == ElColorRVA.Azul ? Color.blue : Color.green;
+        
     }
 
     // Update is called once per frame
@@ -52,7 +77,11 @@ public class PlayerController : MonoBehaviour
     {
         time += Time.deltaTime;
         #region movimiento
-        transform.position += new Vector3(direccion * velocidad * Time.deltaTime, 0, 0);
+        if (Gamemanager._instancia.EstaPausado == false)
+        {
+            transform.position += new Vector3(direccion * velocidad * Time.deltaTime, 0, 0);
+        }
+        
         #endregion
 
         #region raycastSalto
@@ -76,7 +105,16 @@ public class PlayerController : MonoBehaviour
             {
                 Vida--;
                 time = 0;
-
+                Gamemanager._instancia.Biblioteca[4].Invoke();
+                if (Vida == 0)
+                {
+                    MyRigidbody2D.gravityScale = 0;
+                    Collider2D x = GetComponent<Collider2D>();
+                    x.enabled = false;
+                    Gamemanager._instancia.EstaPausado = true;
+                    Gamemanager._instancia.Final = true;
+                    Gamemanager._instancia.Biblioteca[2].Invoke();
+                }
             }
             TocaAlgo = true;
         }
@@ -106,12 +144,15 @@ public class PlayerController : MonoBehaviour
 
     public void Movimiento(InputAction.CallbackContext Value)
     {
-        direccion = Value.ReadValue<float>();
+        if (!Gamemanager._instancia.EstaPausado)
+        {
+            direccion = Value.ReadValue<float>();
+        }
     }
 
     public void salto(InputAction.CallbackContext Value)
     {
-        if (Value.started)
+        if (Value.started && !Gamemanager._instancia.EstaPausado)
         {
             if (numeroDeSaltos > 0)
             {
@@ -122,36 +163,61 @@ public class PlayerController : MonoBehaviour
         }
         
     }
-    void cambiarDeColor()
-    {
-
-    }
 
     public void cambiarDeColorRojo(InputAction.CallbackContext Value)
     {
-        if (!TocaAlgo)
+        if (!TocaAlgo && !Gamemanager._instancia.EstaPausado)
         {
             ElColor = ElColorRVA.Rojo;
             MySpriteRenderer.color = Color.red;
-            cambiarDeColor();
         }
     }
     public void cambiarDeColorVerde(InputAction.CallbackContext Value)
     {
-        if (!TocaAlgo)
+        if (!TocaAlgo && !Gamemanager._instancia.EstaPausado)
         {
             ElColor = ElColorRVA.Verde;
             MySpriteRenderer.color = Color.green;
-            cambiarDeColor();
         }
     }
     public void cambiarDeColorAzul(InputAction.CallbackContext Value)
     {
-        if (!TocaAlgo)
+        if (!TocaAlgo && !Gamemanager._instancia.EstaPausado)
         {
             ElColor = ElColorRVA.Azul;
             MySpriteRenderer.color = Color.blue;
-            cambiarDeColor();
+        }
+    }
+
+
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        switch (collision.tag)
+        {
+            case "Moneda":
+                {
+                    puntaje += 10;
+                    
+                    Gamemanager._instancia.Biblioteca[5].Invoke();
+                    Destroy(collision.gameObject);
+                }
+                break;
+            case "Corazon":
+                {
+                    Vida = Vida < VidaMax ? Vida + 1 : Vida;
+                    Gamemanager._instancia.Biblioteca[4].Invoke();
+                    Destroy(collision.gameObject);
+                }
+                break;
+            case "Final":
+                {
+                    direccion = 0;
+                    Gamemanager._instancia.Final = true;
+                    Gamemanager._instancia.Biblioteca[3].Invoke();
+                    Destroy(collision.gameObject);
+                }
+                break;
         }
     }
 
