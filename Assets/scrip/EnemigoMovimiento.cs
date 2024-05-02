@@ -17,17 +17,14 @@ public class EnemigoMovimiento : Enemigo
     // Update is called once per frame
     void Update()
     {
-        if (!Gamemanager._instancia.EstaPausado)
+        if (Vector2.Distance(transform.position, listaDePosiciones[index]) > distancia)
         {
-            if (Vector2.Distance(transform.position, listaDePosiciones[index]) > distancia)
-            {
-                Vector2 direccion = listaDePosiciones[index] - new Vector2(transform.position.x, transform.position.y);
-                transform.position = new Vector2(transform.position.x, transform.position.y) + direccion.normalized * velocity * Time.deltaTime;
-            }
-            else
-            {
-                index = index < listaDePosiciones.Length - 1 ? index + 1 : 0;
-            }
+            Vector2 direccion = listaDePosiciones[index] - new Vector2(transform.position.x, transform.position.y);
+            transform.position = new Vector2(transform.position.x, transform.position.y) + direccion.normalized * velocity * Time.deltaTime;
+        }
+        else
+        {
+            index = index < listaDePosiciones.Length - 1 ? index + 1 : 0;
         }
     }
 }

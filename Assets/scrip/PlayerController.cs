@@ -43,6 +43,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] int puntaje = 0;
 
 
+    [SerializeField] Handler LaInteraccion;
+
+
     public float PublicVida()
     {
         return (float)Vida;
@@ -58,9 +61,10 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        Gamemanager._instancia.AgregarFuncion(PublicVida, 6);
-        Gamemanager._instancia.AgregarFuncion(PublicVidaMax, 7);
-        Gamemanager._instancia.AgregarFuncion(PublicPuntaje, 8);
+        LaInteraccion.LosEventos.DesactivarEventosJugador();
+        LaInteraccion.LosEventos.VidaJugador += PublicVida;
+        LaInteraccion.LosEventos.VidaMaxJugador += PublicVidaMax;
+        LaInteraccion.LosEventos.Puntaje += PublicPuntaje;
     }
 
     // Start is called before the first frame update
@@ -77,11 +81,8 @@ public class PlayerController : MonoBehaviour
     {
         time += Time.deltaTime;
         #region movimiento
-        if (Gamemanager._instancia.EstaPausado == false)
-        {
-            transform.position += new Vector3(direccion * velocidad * Time.deltaTime, 0, 0);
-        }
-        
+        transform.position += new Vector3(direccion * velocidad * Time.deltaTime, 0, 0);
+
         #endregion
 
         #region raycastSalto
@@ -101,19 +102,19 @@ public class PlayerController : MonoBehaviour
 
         if(hit.collider != null)
         {
+            print("recibi daño 1");
             if (hit.collider.GetComponent<Enemigo>().ElColor != ElColor && time > timeMax)
             {
+                print("recibi daño 2");
                 Vida--;
                 time = 0;
-                Gamemanager._instancia.Biblioteca[4].Invoke();
+                LaInteraccion.LosEventos.ActivarActualizarVida();
                 if (Vida == 0)
                 {
-                    MyRigidbody2D.gravityScale = 0;
+                    Time.timeScale = 0;
                     Collider2D x = GetComponent<Collider2D>();
                     x.enabled = false;
-                    Gamemanager._instancia.EstaPausado = true;
-                    Gamemanager._instancia.Final = true;
-                    Gamemanager._instancia.Biblioteca[2].Invoke();
+                    LaInteraccion.LosEventos.ActivarAparecerPanelPerder();
                 }
             }
             TocaAlgo = true;
@@ -144,15 +145,12 @@ public class PlayerController : MonoBehaviour
 
     public void Movimiento(InputAction.CallbackContext Value)
     {
-        if (!Gamemanager._instancia.EstaPausado)
-        {
-            direccion = Value.ReadValue<float>();
-        }
+        direccion = Value.ReadValue<float>();
     }
 
     public void salto(InputAction.CallbackContext Value)
     {
-        if (Value.started && !Gamemanager._instancia.EstaPausado)
+        if (Value.started)
         {
             if (numeroDeSaltos > 0)
             {
@@ -166,7 +164,7 @@ public class PlayerController : MonoBehaviour
 
     public void cambiarDeColorRojo(InputAction.CallbackContext Value)
     {
-        if (!TocaAlgo && !Gamemanager._instancia.EstaPausado)
+        if (!TocaAlgo)
         {
             ElColor = ElColorRVA.Rojo;
             MySpriteRenderer.color = Color.red;
@@ -174,7 +172,7 @@ public class PlayerController : MonoBehaviour
     }
     public void cambiarDeColorVerde(InputAction.CallbackContext Value)
     {
-        if (!TocaAlgo && !Gamemanager._instancia.EstaPausado)
+        if (!TocaAlgo)
         {
             ElColor = ElColorRVA.Verde;
             MySpriteRenderer.color = Color.green;
@@ -182,7 +180,7 @@ public class PlayerController : MonoBehaviour
     }
     public void cambiarDeColorAzul(InputAction.CallbackContext Value)
     {
-        if (!TocaAlgo && !Gamemanager._instancia.EstaPausado)
+        if (!TocaAlgo)
         {
             ElColor = ElColorRVA.Azul;
             MySpriteRenderer.color = Color.blue;
@@ -198,23 +196,23 @@ public class PlayerController : MonoBehaviour
             case "Moneda":
                 {
                     puntaje += 10;
-                    
-                    Gamemanager._instancia.Biblioteca[5].Invoke();
+
+                    LaInteraccion.LosEventos.ActivarActualizarPuntaje();
                     Destroy(collision.gameObject);
                 }
                 break;
             case "Corazon":
                 {
                     Vida = Vida < VidaMax ? Vida + 1 : Vida;
-                    Gamemanager._instancia.Biblioteca[4].Invoke();
+                    LaInteraccion.LosEventos.ActivarActualizarVida();
                     Destroy(collision.gameObject);
                 }
                 break;
             case "Final":
                 {
+                    Time.timeScale = 0;
                     direccion = 0;
-                    Gamemanager._instancia.Final = true;
-                    Gamemanager._instancia.Biblioteca[3].Invoke();
+                    LaInteraccion.LosEventos.ActivarAparecerPanelGanar();
                     Destroy(collision.gameObject);
                 }
                 break;

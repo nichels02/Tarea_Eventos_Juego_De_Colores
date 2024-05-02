@@ -41,7 +41,7 @@ public class ControladorGrupoDeEnemigos : MonoBehaviour
                 }
             }
         }
-        else if(!Gamemanager._instancia.EstaPausado)
+        else
         {
             tiempo += Time.deltaTime;
         }

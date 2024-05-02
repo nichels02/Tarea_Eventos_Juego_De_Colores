@@ -17,17 +17,21 @@ public class LaUiController : MonoBehaviour
     [SerializeField] GameObject ElPanel;
 
 
+
+    [SerializeField] Handler LaInteraccion;
+
+
     [SerializeField] int EltiempoMax = 300;
     int Eltiempo = 300;
+    float cronometro;
 
     private void Awake()
     {
-        Gamemanager._instancia.AgregarFuncion(ActualizarTiempo, 0);
-        Gamemanager._instancia.AgregarFuncion(AparecerPanelPausa, 1);
-        Gamemanager._instancia.AgregarFuncion(AparecerPanelPerder, 2);
-        Gamemanager._instancia.AgregarFuncion(AparecerPanelGanar, 3);
-        Gamemanager._instancia.AgregarFuncion(ActualizarVida, 4);
-        Gamemanager._instancia.AgregarFuncion(ActualizarPuntaje, 5);
+        LaInteraccion.LosEventos.DesactivarEventosUI();
+        LaInteraccion.LosEventos.AparecerPanelGanar += AparecerPanelGanar;
+        LaInteraccion.LosEventos.AparecerPanelPerder += AparecerPanelPerder;
+        LaInteraccion.LosEventos.ActualizarVida += ActualizarVida;
+        LaInteraccion.LosEventos.ActualizarPuntaje += ActualizarPuntaje;
     }
 
 
@@ -39,60 +43,62 @@ public class LaUiController : MonoBehaviour
         
     }
 
+    private void Update()
+    {
+        cronometro = cronometro < 1 ? cronometro + Time.deltaTime : ActualizarTiempo();
+    }
+
     #region Botones
-    
+
     public void VolverAlMenu()
     {
+        Time.timeScale = 1;
         //fijarme numero de escena
         SceneManager.LoadScene(1);
     }
 
     public void ReiniciarNivel()
     {
+        Time.timeScale = 1;
+        int escenaActual = SceneManager.GetActiveScene().buildIndex;
         //Gamemanager._instancia.EstaPausado = false;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene(escenaActual);
     }
 
     #endregion
 
 
     #region EventosBiblioteca
-    public float AparecerPanelPausa()
+    public void AparecerPanelPausa()
     {
         ElTextoPanelPausa.SetActive(!ElPanel.activeSelf);
         ElPanel.SetActive(!ElPanel.activeSelf);
-        ElTextoPanelPuntaje.text = "Puntaje: " + Gamemanager._instancia.Biblioteca[8].Invoke();
-        return 0;
+        ElTextoPanelPuntaje.text = "Puntaje: " + LaInteraccion.LosEventos.ActivarPuntaje();
     }
 
-    public float AparecerPanelPerder()
+    public void AparecerPanelPerder()
     {
-        ElTextoPanelPuntaje.text = "Puntaje: " + Gamemanager._instancia.Biblioteca[8].Invoke();
+        ElTextoPanelPuntaje.text = "Puntaje: " + LaInteraccion.LosEventos.ActivarPuntaje();
         ElTextoPanelPerder.SetActive(true);
         ElPanel.SetActive(true);
-        return 0;
     }
 
-    public float AparecerPanelGanar()
+    public void AparecerPanelGanar()
     {
-        Gamemanager._instancia.EstaPausado = true;
-        ElTextoPanelPuntaje.text = "Puntaje: " + Gamemanager._instancia.Biblioteca[8].Invoke();
+        ElTextoPanelPuntaje.text = "Puntaje: " + LaInteraccion.LosEventos.ActivarPuntaje();
         ElTextoPanelGanar.SetActive(true);
         ElPanel.SetActive(true);
-        return 0;
     }
 
-    public float ActualizarVida()
+    public void ActualizarVida()
     {
-        LaVida.fillAmount = Gamemanager._instancia.Biblioteca[6].Invoke() / Gamemanager._instancia.Biblioteca[7].Invoke();
-        return 0;
+        LaVida.fillAmount = LaInteraccion.LosEventos.ActivarVidaJugador() / LaInteraccion.LosEventos.ActivarVidaMaxJugador();
     }
 
-    public float ActualizarPuntaje()
+    public void ActualizarPuntaje()
     {
-        print("Puntaje: " + Gamemanager._instancia.Biblioteca[8].Invoke());
-        ElTextoPuntaje.text = "Puntaje: " + Gamemanager._instancia.Biblioteca[8].Invoke();
-        return 0f;
+        print("Puntaje: " + LaInteraccion.LosEventos.ActivarPuntaje());
+        ElTextoPuntaje.text = "Puntaje: " + LaInteraccion.LosEventos.ActivarPuntaje();
     }
 
     public float ActualizarTiempo()

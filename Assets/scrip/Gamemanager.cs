@@ -6,15 +6,15 @@ using UnityEngine.InputSystem;
 
 public class Gamemanager : MonoBehaviour
 {
-    public static Gamemanager _instancia { get; private set; }
+    //public static Gamemanager _instancia { get; private set; }
 
     public float eltiempo;
-    public bool EstaPausado;
+    //public bool EstaPausado;
     public bool Final;
 
     public List<Func<float>> Biblioteca { get; private set; } = new List<Func<float>>();
 
-
+    /*
     private void Awake()
     {
         // Si ya existe una instancia diferente de esta clase, destruimos este objeto
@@ -28,21 +28,21 @@ public class Gamemanager : MonoBehaviour
             _instancia = this;
         }
     }
-
+    */
 
 
 
     // Update is called once per frame
     void Update()
     {
-        eltiempo = EstaPausado ? eltiempo : eltiempo < 1 ? eltiempo + Time.deltaTime : Biblioteca[0].Invoke();
+        //eltiempo = eltiempo < 1 ? eltiempo + Time.deltaTime : Biblioteca[0].Invoke();
     }
 
     public void PausarElJuego(InputAction.CallbackContext Value)
     {
         if (Value.started && Final == false)
         {
-            EstaPausado = EstaPausado ? false : true;
+            //EstaPausado = EstaPausado ? false : true;
             Biblioteca[1].Invoke();
         }
     }
