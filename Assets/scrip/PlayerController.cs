@@ -1,3 +1,4 @@
+using FMODUnity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -45,7 +46,10 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] Handler LaInteraccion;
 
-
+    private static FMOD.Studio.EventInstance musicInstance;
+    public string eventPathSalto = "event:/Salto";
+    public string eventPathGolpe = "event:/Golpe";
+    public string eventPathMoneda = "event:/Moneda";
     public float PublicVida()
     {
         return (float)Vida;
@@ -65,6 +69,7 @@ public class PlayerController : MonoBehaviour
         LaInteraccion.LosEventos.VidaJugador += PublicVida;
         LaInteraccion.LosEventos.VidaMaxJugador += PublicVidaMax;
         LaInteraccion.LosEventos.Puntaje += PublicPuntaje;
+        
     }
 
     // Start is called before the first frame update
@@ -105,6 +110,8 @@ public class PlayerController : MonoBehaviour
             print("recibi daño 1");
             if (hit.collider.GetComponent<Enemigo>().ElColor != ElColor && time > timeMax)
             {
+                musicInstance = RuntimeManager.CreateInstance(eventPathGolpe);
+                musicInstance.start();
                 print("recibi daño 2");
                 Vida--;
                 time = 0;
@@ -154,6 +161,8 @@ public class PlayerController : MonoBehaviour
         {
             if (numeroDeSaltos > 0)
             {
+                musicInstance = RuntimeManager.CreateInstance(eventPathSalto);
+                musicInstance.start();
                 print("salto");
                 MyRigidbody2D.AddForce(Vector2.up * FuerzaDeSalto, ForceMode2D.Impulse);
                 numeroDeSaltos--;
@@ -195,6 +204,8 @@ public class PlayerController : MonoBehaviour
         {
             case "Moneda":
                 {
+                    musicInstance = RuntimeManager.CreateInstance(eventPathMoneda);
+                    musicInstance.start();
                     puntaje += 10;
 
                     LaInteraccion.LosEventos.ActivarActualizarPuntaje();
